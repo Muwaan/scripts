@@ -1,0 +1,24 @@
+#!/bin/bash																		
+#MOAB/Torque submission script for Sandy														
+#																		
+#PBS -l nodes=1:m256g:ppn=16,walltime=24:00:00																
+#PBS -N	Lepitest5																
+#PBS -q sandy																
+																		
+# load modules																
+module load intel/14.0.1 sparsehash/2.0.2 samtools/0.1.19														
+																		
+#DIRECTORY TO RUN 0 $PBS_O_WORKDIR is directory job was submitted from								
+cd $SCRATCH/stacks/Lepidothrix/			
+			
+      																		
+# EXECUTION COMMAND;
+export OMP_NUM_THREADS=16
+src=$SCRATCH/stacks/Lepidothrix/
+files="PPS374	PPS375	SER30	TLPAA236	TLPB003	TLPC057	TLPc074	TLPC108	TLPc151	WM384"
+i=124
+for file in $files
+do
+cd $HOME/stacks-1.34/bin; ./ustacks -t gzfastq -i $i -d -r -p 16 -M 3 -m 2 --max_locus_stacks 3 --model_type bounded --bound_low 0 --bound_high 0.2 -f $src/${file}.fq.gz -o $src/M3_m2_upbound_2/
+let "i+=1"
+done
