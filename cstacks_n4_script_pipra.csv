@@ -1,0 +1,26 @@
+#!/bin/bash																		
+#MOAB/Torque submission script for Sandy														
+#																		
+#PBS -l nodes=1:m256g:ppn=16,walltime=48:00:00																
+#PBS -N	Pipracstacks																
+#PBS -q sandy																
+																		
+# load modules																
+module load intel/14.0.1 sparsehash/2.0.2 samtools/0.1.19														
+																		
+#DIRECTORY TO RUN 0 $PBS_O_WORKDIR is directory job was submitted from								
+cd $SCRATCH/stacks/Pipra/cleaned/M3/	
+      																		
+# EXECUTION COMMAND;
+export OMP_NUM_THREADS=16
+src=$SCRATCH/stacks/Pipra/cleaned/M3/
+files="UFAC590 B27461 MAD632 UFAC1427 ESEC229 BRJ63003 TM027 PEMA055 BMP002 FCA027 CN1185 CN1229 FMNH391571 KU94844 MAYA018 MAD050 MPDS576 MAD030 MAD070 MAD031 MAD483 MAD129 MAD240 MAD354 MAD434 AMA444"
+samp=""
+for file in $files
+do 
+    samp+="-s $src/$file ";
+done
+cd $HOME/stacks-1.34/bin; ./cstacks -b 1 -p 16 -n 4 -o $src $samp &>> $src/Log
+
+
+
