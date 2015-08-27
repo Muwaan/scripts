@@ -1,0 +1,63 @@
+setwd("/home/pipra/oceanview/records/")
+spectrafiles <- list.files(pattern="Reflection_1.txt")
+WAVE <- read.table("waves.txt", header = TRUE) 
+n <- length(spectrafiles)    
+TITLE2 <- vector(mode = "character", length = n)  
+for(i in 1:n){
+    TITLE1 <- read.table(spectrafiles[i], fill = TRUE, header = FALSE, sep = "", strip.white = TRUE)
+    TITLE2[i] <- as.character(TITLE1[1,3])
+}  
+PREDATA1 <- lapply(spectrafiles, read.table, skip = 18L, header = FALSE)
+PREDATA2 <- lapply(PREDATA1, t)
+PREDATA3 <- as.data.frame(PREDATA2)
+PREDATA4 <- (PREDATA3[3:2050,])
+PREDATA4 <- as.matrix(PREDATA4)
+NAMES <- vector(mode = "character", length = ncol(PREDATA4))
+for(i in 1:length(TITLE2)){
+ STOP <- i*20
+ START <- STOP - 19
+ NAMES[START:STOP] <- rep(TITLE2[i],each=20)
+}
+colnames(PREDATA4) <- NAMES
+SPECDATA <- cbind(WAVE, PREDATA4)
+names(SPECDATA)[1] <- "wavelength"
+write.csv(SPECDATA, file = "final_specs.csv")
+
+
+library(pavo)
+PRESPEC <- read.csv("final_specs.csv", header=TRUE)
+SPEC <- (PRESPEC[,2:902])
+LEPISPEC <- as.rspec(SPEC, whichwl = 1, interp = FALSE, lim = c(300, 800))
+is.rspec(LEPISPEC)
+white_standard <- subset(LEPISPEC, "white_sd")
+dark_reference <- subset(LEPISPEC, "dark_sd")
+iris_eucephala <- subset(LEPISPEC, "L.iris_eucephala")
+iris_iris <- subset(LEPISPEC, "L.iris_iris")
+nattereri_gracilis <- subset(LEPISPEC, "L.nattereri_gracilis")
+nattereri_nattereri <- subset(LEPISPEC, "L.nattereri_nattereri")
+vilasboasi <- subset(LEPISPEC, "L.vilasboasi")
+
+
+explorespec(iris_eucephala, by=20, xlim=c(300,750), ylim=c(0,400), lwd=2)
+explorespec(iris_iris, by=20, xlim=c(300,750), ylim=c(0,400), lwd=2)
+explorespec(nattereri_gracilis, by=20, xlim=c(300,750), ylim=c(0,100), lwd=2)
+explorespec(nattereri_nattereri, by=20, xlim=c(300,750), ylim=c(0,100), lwd=2)
+explorespec(vilasboasi, by=20, xlim=c(300,750), ylim=c(0,100), lwd=2)
+
+mspecsie <- aggspec(iris_eucephala, by = 20, FUN = mean)
+mspecsii <- aggspec(iris_iris, by = 20, FUN = mean)
+mspecsng <- aggspec(nattereri_gracilis, by = 20, FUN = mean)
+mspecsnn <- aggspec(nattereri_nattereri, by = 20, FUN = mean)
+mspecsvi <- aggspec(vilasboasi, by = 20, FUN = mean)
+
+aveririseu <- aggspec(mspecsie, FUN = mean)
+aveririiris <- aggspec(mspecsii, FUN = mean)
+avernattergrac <- aggspec(mspecsng, FUN = mean)
+avernatternatter <- aggspec(mspecsnn, FUN = mean)
+avervilas <- aggspec(mspecsvi, FUN = mean)
+<- cbind
+
+
+
+
+
